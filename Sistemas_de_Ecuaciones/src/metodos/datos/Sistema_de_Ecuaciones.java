@@ -44,7 +44,8 @@ public class Sistema_de_Ecuaciones {
         return coeficientes_independientes;
     }
 
-    public String ecuacion_toString(){
+    @Override
+    public String toString(){
         String cadena = "";
         var arreglo_coeficientes_variables = coeficientes_variables_toString().split("\n");
         var arreglo_coeficientes_independientes = coeficientes_independientes_toString().split("\n");
@@ -66,6 +67,18 @@ public class Sistema_de_Ecuaciones {
             cadena += Arrays.toString(fila) + "\n";
         }
         return cadena;
+    }
+
+    public void set_ecuaciones(double[][] ecuaciones){
+        int contar = 0;
+        for (double[] fila : ecuaciones) {
+            set_fila(fila, contar++);
+        }
+    }
+
+    public void set_ecuaciones(double[][] coeficientes_variables, double[][] coeficientes_independientes){
+        this.coeficientes_variables = Arrays.copyOf(coeficientes_variables, (int)Math.pow(coeficientes_variables.length,2));
+        this.coeficientes_independientes = Arrays.copyOf(coeficientes_independientes, (int)Math.pow(coeficientes_independientes.length,2));
     }
     
 }

@@ -18,7 +18,15 @@ import metodos.Gauss_Jordan;
 
 public class Principal {
     public static void main(String[] args) {
-        var gauss = new Gauss_Jordan(3);
-        System.out.println(gauss.get_ecuacion()); // funciona :D
+        var ecuaciones = new double[][]{
+            {3,-0.1,-0.2,7.85},
+            {0.1,7,-0.3,-19.3},
+            {0.3,-0.2,10,71.4}
+        };
+        var gauss = new Gauss_Jordan(ecuaciones,3);
+        gauss.calcular();
+        System.out.println(gauss.get_sistema_de_ecuaciones().toString()); // funciona :D
+
+
     }
 }

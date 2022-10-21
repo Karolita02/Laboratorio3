@@ -6,11 +6,18 @@ import metodos.datos.Sistema_de_Ecuaciones;
 
 public class Gauss_Jordan {
     private Sistema_de_Ecuaciones sistema_de_ecuaciones;
-    public Gauss_Jordan(int numero_incognitas){
+    private int numero_incognitas;
+    public Gauss_Jordan(double[][] ecuaciones, int numero_incognitas){
+        this.numero_incognitas = numero_incognitas;
         sistema_de_ecuaciones = new Sistema_de_Ecuaciones(numero_incognitas);
-        sistema_de_ecuaciones.set_fila(new double[]{3,-0.1,-0.2,7.85}, 0);
-        sistema_de_ecuaciones.set_fila(new double[]{0.1,7,-0.3,-19.3}, 1);
-        sistema_de_ecuaciones.set_fila(new double[]{0.3,-0.2,10,71.4}, 2);
+        sistema_de_ecuaciones.set_ecuaciones(ecuaciones);
+    }
+    public Gauss_Jordan(double[][] coeficientes_variables, double[][] coeficientes_independientes, int numero_incognitas){
+        this.numero_incognitas = numero_incognitas;
+        sistema_de_ecuaciones = new Sistema_de_Ecuaciones(numero_incognitas);
+        sistema_de_ecuaciones.set_ecuaciones(coeficientes_variables, coeficientes_independientes);
+    }
+    public void calcular() {
         for (int actual = 0; actual < numero_incognitas; actual++) {
             var fila_dominante = sistema_de_ecuaciones.get_fila(actual);
             var denominador = fila_dominante[actual] != 0 ? fila_dominante[actual] : 1; //TODO mandar error
@@ -39,7 +46,17 @@ public class Gauss_Jordan {
         }
         return fila_resultante;
     }
-    public String get_ecuacion(){
-        return sistema_de_ecuaciones.ecuacion_toString();
+    public Sistema_de_Ecuaciones get_sistema_de_ecuaciones() {
+        return sistema_de_ecuaciones;
     }
+    public void set_sistema_de_ecuaciones(Sistema_de_Ecuaciones sistema_de_ecuaciones) {
+        this.sistema_de_ecuaciones = sistema_de_ecuaciones;
+    }
+    public int get_numero_incognitas() {
+        return numero_incognitas;
+    }
+    public void set_numero_incognitas(int numero_incognitas) {
+        this.numero_incognitas = numero_incognitas;
+    }
+    
 }
