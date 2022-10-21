@@ -1,5 +1,7 @@
 package programa;
 
+import metodos.Gauss_Jordan;
+
 /*
  * Desarrollar en Java un programa que determine la solución de un sistema de ecuaciones 
  * mediante el método de Gauss-Jordan y el método matricial Inv(A)*b   El ingreso de los datos 
@@ -15,5 +17,8 @@ package programa;
  */
 
 public class Principal {
-    
+    public static void main(String[] args) {
+        var gauss = new Gauss_Jordan(3);
+        System.out.println(gauss.get_ecuacion()); // funciona :D
+    }
 }
