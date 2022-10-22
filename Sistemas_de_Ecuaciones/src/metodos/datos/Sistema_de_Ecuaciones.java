@@ -2,7 +2,8 @@ package metodos.datos;
 
 import java.util.Arrays;
 
-public class Sistema_de_Ecuaciones {
+public class Sistema_de_Ecuaciones 
+{
     private int numero_incognitas;
     private double[][] coeficientes_variables;
     private double[][] coeficientes_independientes;
