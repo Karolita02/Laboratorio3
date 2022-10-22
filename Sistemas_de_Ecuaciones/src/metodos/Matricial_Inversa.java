@@ -14,19 +14,28 @@ public class Matricial_Inversa extends Resolucion_de_Sistemas_de_Ecuaciones
     }
 
 
-    public double[][] UnirMatrices(double[][]matriz)
+    public double[][] unirMatrices(double[][]matriz)
     {
         int tamañoNuevaMatriz = get_numero_incognitas()*2;
 
-        for (iterable_type iterable_element : iterable) 
-        {
-            
+        
+        
+         
+        
+    }
+    // las funciones en minuscula xd
+    private double[] extraerFila(double[][] matriz, int filaBuscada)
+    {
+        int filaActual = 0;
+        for (double[] fila : matriz) 
+        { 
+            if(filaActual++ == filaBuscada)
+                return fila;
         }
-
-
+        return null;
     }
 
-    public double[][] HacerMatrizIdentidad()
+    public double[][] hacerMatrizIdentidad()
     {
         double[][] matrizIdentidad = new double[get_numero_incognitas()][get_numero_incognitas()];
         for (int i = 0; i < matrizIdentidad.length; i++) 
