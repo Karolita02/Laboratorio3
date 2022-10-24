@@ -6,9 +6,11 @@ public class Sistema_de_Ecuaciones
 {
     private int numero_incognitas;
     private double[][] coeficientes_variables;
-    private double[][] coeficientes_independientes;
+	private double[][] coeficientes_independientes;
 
-    public Sistema_de_Ecuaciones(int numero_incognitas) {
+    
+
+	public Sistema_de_Ecuaciones(int numero_incognitas) {
         this.numero_incognitas = numero_incognitas;
         coeficientes_variables = new double[numero_incognitas][numero_incognitas];
         coeficientes_independientes = new double[numero_incognitas][1];
@@ -58,6 +60,7 @@ public class Sistema_de_Ecuaciones
     public String coeficientes_variables_toString(){
         String cadena = "";
         for (double[] fila : coeficientes_variables) {
+            if(fila == null) break;
             cadena += Arrays.toString(fila) + "\n";
         }
         return cadena;
@@ -65,6 +68,7 @@ public class Sistema_de_Ecuaciones
     public String coeficientes_independientes_toString(){
         String cadena = "";
         for (double[] fila : coeficientes_independientes) {
+            if(fila == null) break;
             cadena += Arrays.toString(fila) + "\n";
         }
         return cadena;
@@ -81,5 +85,10 @@ public class Sistema_de_Ecuaciones
         this.coeficientes_variables = Arrays.copyOf(coeficientes_variables, (int)Math.pow(coeficientes_variables.length,2));
         this.coeficientes_independientes = Arrays.copyOf(coeficientes_independientes, (int)Math.pow(coeficientes_independientes.length,2));
     }
-    
+    public void set_coeficientes_variables(double[][] coeficientes_variables) {
+		this.coeficientes_variables = coeficientes_variables;
+	}
+    public void set_coeficientes_independientes(double[][] coeficientes_independientes) {
+		this.coeficientes_independientes = coeficientes_independientes;
+	}
 }

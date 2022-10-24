@@ -1,6 +1,7 @@
 package programa;
 
 import metodos.Gauss_Jordan;
+import metodos.Matricial_Inversa;
 
 /*
  * Desarrollar en Java un programa que determine la solución de un sistema de ecuaciones 
@@ -23,10 +24,14 @@ public class Principal {
             {0.1,7,-0.3,-19.3},
             {0.3,-0.2,10,71.4}
         };
-        var gauss = new Gauss_Jordan(ecuaciones,3);
-        gauss.calcular();
-        System.out.println(gauss.get_sistema_de_ecuaciones().toString()); // funciona :D
+        // var gauss = new Gauss_Jordan(ecuaciones,3);
+        // gauss.calcular();
+        // System.out.println(gauss.get_sistema_de_ecuaciones().toString()); // funciona :D
 
-
+        var inversa = new Matricial_Inversa(ecuaciones, 3);
+        inversa.calcular();
+        System.out.println(inversa.get_sistema_de_ecuaciones().toString());
+     
+        
     }
 }
