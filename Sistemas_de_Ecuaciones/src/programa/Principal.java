@@ -1,5 +1,6 @@
 package programa;
 
+import interfaz.Ventana;
 import metodos.Gauss_Jordan;
 import metodos.Matricial_Inversa;
 
@@ -28,10 +29,10 @@ public class Principal {
         // gauss.calcular();
         // System.out.println(gauss.get_sistema_de_ecuaciones().toString()); // funciona :D
 
-        var inversa = new Matricial_Inversa(ecuaciones, 3);
-        inversa.calcular();
-        System.out.println(inversa.get_sistema_de_ecuaciones().toString());
-     
+        // var inversa = new Matricial_Inversa(ecuaciones, 3);
+        // inversa.calcular();
+        // System.out.println(inversa.get_sistema_de_ecuaciones().toString());
+        new Ventana();
         
     }
 }
