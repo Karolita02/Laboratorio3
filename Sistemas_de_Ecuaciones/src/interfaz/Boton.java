@@ -18,7 +18,7 @@ public class Boton extends JButton{
         setFocusPainted(false);
         setBorderPainted(false);
         setFont(letra);
-        setVerticalAlignment(JButton.TOP);
+        setVerticalAlignment(JButton.CENTER);
         addMouseListener(new AccionesMouse(this, colorEntered, 
         colorExited));
     }

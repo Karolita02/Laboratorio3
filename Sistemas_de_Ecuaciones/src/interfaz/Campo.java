@@ -11,7 +11,7 @@ public class Campo extends JTextField{
 
     public Campo(Font letra) {
         setFont(letra);
-        setBackground(new Color(158,202,239));
+        setBackground(Ventana.colorIzquierda);
         setForeground(Color.gray);
         addMouseListener(new QuitarSugerencia(this));
         setHorizontalAlignment(JTextField.CENTER);

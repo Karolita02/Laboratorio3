@@ -23,22 +23,18 @@ import javax.swing.table.DefaultTableModel;
 public class Ventana extends JFrame
 {
     private JPanel panelSuperior, panelIzquierdo, panelCentral;
-    private JButton botonPrincipal, botonDatos, botonTabla;
-    private JLabel textoTitulo;
+    private JButton botonPrincipal, botonDatos, botonResultados;
     private JButton botonCerrar, botonMinimizar;
     private JPanel panelAccionesVentana;
     private Dimension tamanoVentana;
-    private JPanel panelPrincipal, panelDatos, panelTabla;
-    private JLabel textoMetodos, textoMetodos2, textoCreadoPor, textoIntegrantes, textoIntegrantes2;
+    private JPanel panelPrincipal, panelDatos, panelResultados;
     private JPanel panelBienvenida;
-    private JButton botonAceptar;
-    private JTable tabla;
-    private JScrollPane panelScroll;
-    private JPanel panelEtiquetas;
-    private JLabel biseccion, reglaFalsa, secante;
-    private JLabel valorA, valorB, valorError, textoFuncion;
-    private JPanel panelInformacion;
-    private JLabel textoIntroducirDatos, textoCoeficientesVariables, textoCoeficientesIndependientes;
+    private JButton botonCalcular;
+    private JScrollPane ScrollGaussJordan, ScrollMatrizInversa;
+    private JPanel panelIncognitas;
+    private Boton botonConfirmar;
+    private Campo campoIncognitas;
+    private PanelScroll ScrollVariables, ScrollIndependientes;
 
     private DecimalFormat formato = new DecimalFormat("#.############");
 
@@ -48,10 +44,12 @@ public class Ventana extends JFrame
     colorCentral = Color.white,
     colorSeleccionarBotonChico = new Color(104,249,205),
     colorBoton = new Color(14,120,88),
-    colorSeleccionarBoton = new Color(87,108,102);
+    colorSeleccionarBoton = new Color(87,108,102),
+    colorTitulo = colorBoton;
     
 
     private Font letraMenu = new Font("Forte", Font.PLAIN, 40),
+    letraMenuChica = new Font("Forte", Font.PLAIN, 33),
     letraTitulo = new Font("Maiandra GD", Font.BOLD, 60), 
     letraSubTitulo = new Font("Maiandra GD", Font.BOLD, 40), 
     letraTexto = new Font("Maiandra GD", Font.PLAIN, 30), 
@@ -64,11 +62,24 @@ public class Ventana extends JFrame
         inicializarPanelSuperior();
         inicializarPanelCentral();
         panelCentral.add(panelPrincipal); // para que sea el primero en aparecer
-        this.textoFuncion.setText("f(x) = " + textoFuncion);
         establecerFuncionBotonesMenu();
+        establacerFuncionBotonConfirmar();
         //establecerFuncionBotonAceptar(funcion);
         setVisible(true);
 
+    }
+    private void establacerFuncionBotonConfirmar() {
+        botonConfirmar.addActionListener((e) -> {
+            try {
+                int tamano = Integer.parseInt(campoIncognitas.getText());
+                ScrollVariables.set_dimensiones(tamano, tamano);
+                ScrollIndependientes.set_dimensiones(tamano, 1);
+                ScrollIndependientes.cambiar_identificadores(new String[]{" "});
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error, Numero Ingresado Invalido", 
+                "ERROR NUMERO INVALIDO", JOptionPane.ERROR_MESSAGE, null);
+            }
+        });
     }
     private boolean opcionSiNo(String mensaje, String titulo){
         while (true) {
@@ -91,9 +102,9 @@ public class Ventana extends JFrame
             panelCentral.updateUI();
         });
 
-        botonTabla.addActionListener((e) -> {
+        botonResultados.addActionListener((e) -> {
             panelCentral.removeAll();
-            panelCentral.add(panelTabla);
+            panelCentral.add(panelResultados);
             panelCentral.updateUI();
         });
     }
@@ -104,98 +115,82 @@ public class Ventana extends JFrame
         add(panelCentral, BorderLayout.CENTER);
         inicializarPanelPrincipal();//! Principal
         inicializarPanelDatos();//! Datos
-        inicializarPanelTabla();//! Tabla
+        inicializarPanelResultados();//! Resultados
 
     }
-    private void inicializarPanelTabla() {
-        panelTabla = new JPanel();
-        panelTabla.setOpaque(false);
-        panelTabla.setLayout(new BorderLayout());
+    private void inicializarPanelResultados() {
+        panelResultados = new JPanel();
+        panelResultados.setOpaque(false);
+        panelResultados.setLayout(null);
+
+        JLabel textoGaussJordan = new JLabel("Gauss-Jordan");
+        textoGaussJordan.setFont(letraTexto);
+        textoGaussJordan.setHorizontalAlignment(JLabel.CENTER);
+        textoGaussJordan.setBounds(220, 20, 300, 50);
 
         DefaultTableModel modeloTabla = new DefaultTableModel(){
             public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
         };
-        modeloTabla.setColumnIdentifiers("Iteracion, Xr, er%, Xr, er%, Xr, er%".split(", "));
-        tabla = new JTable(modeloTabla);
-        tabla.getTableHeader().setReorderingAllowed(false); 
+
+        JTable tablaGaussJordan = new JTable(modeloTabla);
         
-        panelScroll = new JScrollPane(tabla);
-        panelScroll.setBounds(0,100,800,600);
+        ScrollGaussJordan = new PanelScroll(tablaGaussJordan);
+        ScrollGaussJordan.setBounds(20,100,500,200);
 
-        panelEtiquetas = new JPanel();
-        panelEtiquetas.setOpaque(false);
-        panelEtiquetas.setLayout(null);
-        panelEtiquetas.setPreferredSize(new Dimension(0,150));
-
-        int altura = 3 + 100;
-
-        biseccion = new JLabel("Bisección");
-        biseccion.setFont(letraTexto);
-        biseccion.setBounds(165,altura,200,50);
         
-        reglaFalsa = new JLabel("Regla Falsa");
-        reglaFalsa.setFont(letraTexto);
-        reglaFalsa.setBounds(165*2+50,altura,200,50);
-        
-        secante = new JLabel("Secante");
-        secante.setFont(letraTexto);
-        secante.setBounds(165*4-30,altura,200,50);
-        
-        panelEtiquetas.add(biseccion);
-        panelEtiquetas.add(reglaFalsa);
-        panelEtiquetas.add(secante);
-
-        Color colorInfo = new Color(31,105,165);
-
-        valorA = new JLabel("Intervalo (A = ? ,");
-        valorA.setFont(letraTexto);
-        valorA.setForeground(colorInfo);
-   
-        valorB = new JLabel("B = ?)");
-        valorB.setFont(letraTexto);
-        valorB.setForeground(colorInfo);
-   
-        valorError = new JLabel("Error = ?");
-        valorError.setFont(letraTexto);
-        valorError.setForeground(colorInfo);
-        
-        textoFuncion = new JLabel();
-        textoFuncion.setFont(letraTexto);
-        textoFuncion.setForeground(colorInfo);
-
-        panelInformacion = new JPanel();
-        panelInformacion.setOpaque(false);
-        panelInformacion.setBounds(0,15,800,100);
-        var estilo = new FlowLayout(FlowLayout.CENTER);
-        estilo.setHgap(20);
-        panelInformacion.setLayout(estilo);
-
-        panelInformacion.add(valorA);
-        panelInformacion.add(valorB);
-        panelInformacion.add(valorError);
-        panelInformacion.add(textoFuncion);
-
-        panelEtiquetas.add(panelInformacion);
-
-        panelTabla.add(panelScroll, BorderLayout.CENTER);
-        panelTabla.add(panelEtiquetas, BorderLayout.NORTH);
+        panelResultados.add(textoGaussJordan);
+        panelResultados.add(ScrollGaussJordan);
     }
     private void inicializarPanelDatos() {
         panelDatos = new JPanel();
         panelDatos.setOpaque(false);
         panelDatos.setLayout(null);
         
-        textoIntroducirDatos = new JLabel("Introduzca los Siguientes Datos:");
-        textoIntroducirDatos.setFont(letraTexto);
-        textoIntroducirDatos.setBounds(100,50,500,50);
+        panelIncognitas = new JPanel();
+        panelIncognitas.setOpaque(false);
+        panelIncognitas.setLayout(new GridLayout(1,3,50,0));
+        panelIncognitas.setBounds(10,30,750,50);
 
-        botonAceptar = new Boton(letraBoton);
-        botonAceptar.setText("Aceptar");
-        botonAceptar.setVerticalAlignment(JButton.CENTER);
-        botonAceptar.setBounds(280,400,200,50);
+        JLabel textoIncognitas = new JLabel("Incognitas");
+        textoIncognitas.setFont(letraTexto);
+        textoIncognitas.setHorizontalAlignment(JLabel.CENTER);
 
-        panelDatos.add(textoIntroducirDatos);
-        panelDatos.add(botonAceptar);
+        campoIncognitas = new Campo(letraTexto);
+        campoIncognitas.setText("4");
+
+        botonConfirmar = new Boton(letraBoton);
+        botonConfirmar.setText("Confirmar");
+        botonConfirmar.setVerticalAlignment(JButton.CENTER);
+
+        panelIncognitas.add(textoIncognitas);
+        panelIncognitas.add(campoIncognitas);
+        panelIncognitas.add(botonConfirmar);
+
+        JLabel textoCoeficientes = new JLabel("            Coeficientes Variables               Independientes");
+        textoCoeficientes.setFont(letraTexto);
+        textoCoeficientes.setHorizontalAlignment(JLabel.CENTER);
+        textoCoeficientes.setBounds(30,100,800,50);
+
+        JTable tablaVariables = new JTable(new DefaultTableModel());
+
+        ScrollVariables = new PanelScroll(tablaVariables);
+        ScrollVariables.setBounds(20, 170, 600, 300);
+
+        JTable tablaIndependientes = new JTable(new DefaultTableModel());
+
+        ScrollIndependientes = new PanelScroll(tablaIndependientes);
+        ScrollIndependientes.setBounds(600+20+20, 170, 130, 300);
+
+        botonCalcular = new Boton(letraBoton);
+        botonCalcular.setText("Calcular");
+        botonCalcular.setVerticalAlignment(JButton.CENTER);
+        botonCalcular.setBounds(280,500,200,50);
+
+        panelDatos.add(ScrollVariables);
+        panelDatos.add(ScrollIndependientes);
+        panelDatos.add(panelIncognitas);
+        panelDatos.add(textoCoeficientes);
+        panelDatos.add(botonCalcular);
     }
     private void inicializarPanelPrincipal() {
         panelPrincipal = new JPanel();
@@ -208,23 +203,23 @@ public class Ventana extends JFrame
         panelBienvenida.setBounds(50, 150, 
         700, 500);
 
-        textoMetodos = new JLabel("Usando Gauss-Jordan y");
+        JLabel textoMetodos = new JLabel("Usando Gauss-Jordan y");
         textoMetodos.setFont(letraSubTitulo);
         textoMetodos.setHorizontalAlignment(JLabel.CENTER);
 
-        textoMetodos2 = new JLabel("Matriz Inversa");
+        JLabel textoMetodos2 = new JLabel("Matriz Inversa");
         textoMetodos2.setFont(letraSubTitulo);
         textoMetodos2.setHorizontalAlignment(JLabel.CENTER);
 
-        textoCreadoPor = new JLabel("Creado por:");
+        JLabel textoCreadoPor = new JLabel("Creado por:");
         textoCreadoPor.setFont(letraTexto);
         textoCreadoPor.setHorizontalAlignment(JLabel.CENTER);
 
-        textoIntegrantes = new JLabel("Ricardo Sanjur");
+        JLabel textoIntegrantes = new JLabel("Ricardo Sanjur");
         textoIntegrantes.setFont(letraTexto);
         textoIntegrantes.setHorizontalAlignment(JLabel.CENTER);
 
-        textoIntegrantes2 = new JLabel("Thaís Samudio");
+        JLabel textoIntegrantes2 = new JLabel("Thaís Samudio");
         textoIntegrantes2.setFont(letraTexto);
         textoIntegrantes2.setHorizontalAlignment(JLabel.CENTER);
 
@@ -240,10 +235,10 @@ public class Ventana extends JFrame
         
     }
     private void inicializarPanelSuperior() {
-        textoTitulo = new JLabel("Cálculo de Sistemas de Ecuaciones");
+        JLabel textoTitulo = new JLabel("Cálculo de Sistemas de Ecuaciones");
         textoTitulo.setFont(letraTitulo);
         textoTitulo.setHorizontalAlignment(JLabel.CENTER);
-        textoTitulo.setForeground(new Color(0,69,126));
+        textoTitulo.setForeground(colorTitulo);
 
         panelAccionesVentana = new JPanel();
         panelAccionesVentana.setBackground(colorBarraDeAcciones);
@@ -273,14 +268,14 @@ public class Ventana extends JFrame
         botonDatos = new Boton(letraMenu);
         botonDatos.setText("Datos");
 
-        botonTabla = new Boton(letraMenu);
-        botonTabla.setText("Tabla");
+        botonResultados = new Boton(letraMenuChica);
+        botonResultados.setText("Resultados");
 
         panelIzquierdo.add(new JLabel());
         panelIzquierdo.add(new JLabel());
         panelIzquierdo.add(botonPrincipal);
         panelIzquierdo.add(botonDatos);
-        panelIzquierdo.add(botonTabla);
+        panelIzquierdo.add(botonResultados);
         
     }
     private void inicializarVentana() {
