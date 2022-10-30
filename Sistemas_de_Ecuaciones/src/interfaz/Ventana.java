@@ -7,8 +7,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,8 +19,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.event.MouseInputListener;
 import javax.swing.table.DefaultTableModel;
+
+import metodos.Gauss_Jordan;
+import metodos.Matricial_Inversa;
+import metodos.Resolucion_de_Sistemas_de_Ecuaciones;
 
 public class Ventana extends JFrame
 {
@@ -30,11 +36,16 @@ public class Ventana extends JFrame
     private JPanel panelPrincipal, panelDatos, panelResultados;
     private JPanel panelBienvenida;
     private JButton botonCalcular;
-    private JScrollPane ScrollGaussJordan, ScrollMatrizInversa;
+    private PanelScroll scrollGaussJordan, scrollJordanIndep, scrollMatrizInversa, scrollInversaIndep;
     private JPanel panelIncognitas;
     private Boton botonConfirmar;
     private Campo campoIncognitas;
-    private PanelScroll ScrollVariables, ScrollIndependientes;
+    private PanelScroll scrollVariables, scrollIndependientes;
+    private PanelScroll scrollResultadosJordan, scrollResultadosInversa;
+    private ArrayList<JLabel> listaTextos = new ArrayList<>();
+    private ArrayList<PanelScroll> listaScrolls = new ArrayList<>();
+
+    private double[][] coeficientesVariables, coeficientesIndependientes;
 
     private DecimalFormat formato = new DecimalFormat("#.############");
 
@@ -64,31 +75,128 @@ public class Ventana extends JFrame
         panelCentral.add(panelPrincipal); // para que sea el primero en aparecer
         establecerFuncionBotonesMenu();
         establacerFuncionBotonConfirmar();
-        //establecerFuncionBotonAceptar(funcion);
+        establecerFuncionBotonCalcular();
+        establecerFuncionesParaLimpiarTablas();
         setVisible(true);
 
+    }
+    private void establecerFuncionesParaLimpiarTablas() {
+        for (JLabel texto : listaTextos)
+            texto.addMouseListener(new limpiarSeleccion());
+        panelResultados.addMouseListener(new limpiarSeleccion());
+        panelDatos.addMouseListener(new limpiarSeleccion());
+        panelIncognitas.addMouseListener(new limpiarSeleccion());
+    }
+    private void establecerFuncionBotonCalcular() {
+        botonCalcular.addActionListener((e) -> {
+            if(scrollVariables.matriz.isEditing())
+                scrollVariables.matriz.getCellEditor().stopCellEditing();
+            if(scrollIndependientes.matriz.isEditing())
+                scrollIndependientes.matriz.getCellEditor().stopCellEditing();
+            try {
+                extraerAMatriz(scrollVariables, coeficientesVariables); 
+                extraerAMatriz(scrollIndependientes, coeficientesIndependientes); 
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error, El Valor Ingresado en la Tabla es Invalido", 
+                    "ERROR VALOR INVALIDO", JOptionPane.ERROR_MESSAGE, null);
+                return;
+            }
+    
+            int numeroIncognitas = coeficientesVariables.length;
+    
+            Resolucion_de_Sistemas_de_Ecuaciones[] metodos = {
+                new Gauss_Jordan(coeficientesVariables, coeficientesIndependientes, numeroIncognitas),
+                new Matricial_Inversa(coeficientesVariables, coeficientesIndependientes, numeroIncognitas)
+            };
+    
+            PanelScroll[] panelesScroll = {
+                scrollGaussJordan,
+                scrollJordanIndep,
+                scrollResultadosJordan,
+                scrollMatrizInversa,
+                scrollInversaIndep,
+                scrollResultadosInversa
+            };
+    
+            var actual = 0;
+            for (var metodo : metodos){
+                metodo.calcular();
+                extraerATabla(metodo, panelesScroll[actual],false, coeficientesIndependientes);
+                extraerATabla(metodo, panelesScroll[actual+1],true, coeficientesIndependientes);
+                ponerResultadosEnTabla(metodo, panelesScroll[actual+2]);
+                actual += 3;
+            }
+            
+            JOptionPane.showMessageDialog(this, "Los Calculos Han Sido Realizados Con Exito", 
+            "Calculos Realizados Con Exito", JOptionPane.INFORMATION_MESSAGE, null);
+        });
+    }
+    private void ponerResultadosEnTabla(Resolucion_de_Sistemas_de_Ecuaciones metodo, PanelScroll tabla){
+        var valores = metodo.get_sistema_de_ecuaciones().get_coeficientes_independientes();
+        for (int pos = 0; pos < metodo.get_numero_incognitas(); pos++)
+            tabla.modeloTabla.setValueAt(valores[pos][0], 0, pos);
+    }
+    private void extraerATabla(Resolucion_de_Sistemas_de_Ecuaciones metodo, PanelScroll tabla, boolean esIndependiente, double[][] matrizB){
+        var matrizResultado = esIndependiente ? 
+            metodo.get_sistema_de_ecuaciones().get_coeficientes_independientes() :
+            metodo.get_sistema_de_ecuaciones().get_coeficientes_variables();
+        var objetoResultado = esIndependiente && metodo instanceof Matricial_Inversa ? 
+            convertirMatrizAObjeto(matrizB) :
+            convertirMatrizAObjeto(matrizResultado);
+        tabla.modeloTabla.setRowCount(0);
+        for (Object[] fila : objetoResultado) 
+            tabla.modeloTabla.addRow(fila);
+    }
+    private Object[][] convertirMatrizAObjeto(double[][] matriz){
+        var resultado = new Object[matriz.length][matriz[0].length];
+        for (int i = 0; i < matriz.length; i++) 
+            for (int j = 0; j < matriz[0].length; j++) 
+                resultado[i][j] = matriz[i][j];
+        return resultado;
+    }
+    private void extraerAMatriz(PanelScroll scrollTabla, double[][] matriz) {
+        var tablaVariables = scrollTabla.modeloTabla.getDataVector();
+        for (int i = 0; i < matriz.length; i++) 
+            for (int j = 0; j < matriz[0].length; j++) 
+                matriz[i][j] = Double.parseDouble(tablaVariables.get(i).get(j).toString());
     }
     private void establacerFuncionBotonConfirmar() {
         botonConfirmar.addActionListener((e) -> {
             try {
                 int tamano = Integer.parseInt(campoIncognitas.getText());
-                ScrollVariables.set_dimensiones(tamano, tamano);
-                ScrollIndependientes.set_dimensiones(tamano, 1);
-                ScrollIndependientes.cambiar_identificadores(new String[]{" "});
+
+                scrollVariables.set_dimensiones(tamano, tamano);
+                scrollIndependientes.set_dimensiones(tamano, 1);
+                scrollIndependientes.cambiar_identificadores(new String[]{" "});
+                
+                scrollGaussJordan.set_dimensiones(tamano, tamano);
+                scrollJordanIndep.set_dimensiones(tamano, 1);
+                scrollJordanIndep.cambiar_identificadores(new String[]{" "});
+                
+                scrollMatrizInversa.set_dimensiones(tamano, tamano);
+                scrollInversaIndep.set_dimensiones(tamano, 1);
+                scrollInversaIndep.cambiar_identificadores(new String[]{"Matriz B"});
+                
+                scrollResultadosJordan.set_dimensiones(1, tamano);
+                scrollResultadosInversa.set_dimensiones(1, tamano);
+
+
+                coeficientesVariables = new double[tamano][tamano];
+                coeficientesIndependientes = new double[tamano][1];
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error, Numero Ingresado Invalido", 
                 "ERROR NUMERO INVALIDO", JOptionPane.ERROR_MESSAGE, null);
             }
         });
     }
-    private boolean opcionSiNo(String mensaje, String titulo){
-        while (true) {
-            int valor = JOptionPane.showOptionDialog(null, mensaje, titulo, 0, 1, null, "Si, No".split(", "), null);
-            if(valor != -1)
-                return valor == 0; // 0 = Si, 1 = No, -1 = Cerrar la ventana
-            JOptionPane.showMessageDialog(this, "ERROR, DEBE ELEGIR UNA DE LAS OPCIONES", "ERROR OPCION INVALIDA", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+    // private boolean opcionSiNo(String mensaje, String titulo){
+    //     while (true) {
+    //         int valor = JOptionPane.showOptionDialog(null, mensaje, titulo, 0, 1, null, "Si, No".split(", "), null);
+    //         if(valor != -1)
+    //             return valor == 0; // 0 = Si, 1 = No, -1 = Cerrar la ventana
+    //         JOptionPane.showMessageDialog(this, "ERROR, DEBE ELEGIR UNA DE LAS OPCIONES", "ERROR OPCION INVALIDA", JOptionPane.ERROR_MESSAGE);
+    //     }
+    // }
     private void establecerFuncionBotonesMenu() {
         botonPrincipal.addActionListener((e) -> {
             panelCentral.removeAll();
@@ -124,22 +232,106 @@ public class Ventana extends JFrame
         panelResultados.setLayout(null);
 
         JLabel textoGaussJordan = new JLabel("Gauss-Jordan");
+        listaTextos.add(textoGaussJordan);
         textoGaussJordan.setFont(letraTexto);
         textoGaussJordan.setHorizontalAlignment(JLabel.CENTER);
-        textoGaussJordan.setBounds(220, 20, 300, 50);
+        textoGaussJordan.setBounds(220, 5, 300, 50);
 
-        DefaultTableModel modeloTabla = new DefaultTableModel(){
+        int posVertical = 60;
+        int posHorizontal = 20; 
+        int alto = 150;
+        int ancho = 600;
+        JTable tablaGaussJordan = new JTable(new DefaultTableModel(){
             public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
-        };
-
-        JTable tablaGaussJordan = new JTable(modeloTabla);
+        });
         
-        ScrollGaussJordan = new PanelScroll(tablaGaussJordan);
-        ScrollGaussJordan.setBounds(20,100,500,200);
+        scrollGaussJordan = new PanelScroll(tablaGaussJordan);
+        listaScrolls.add(scrollGaussJordan);
+        scrollGaussJordan.setBounds(posHorizontal, posVertical, ancho, alto);
+        
+        posVertical += alto*2;
 
+        JLabel textoMatrizInversa = new JLabel("Matriz Inversa * Matriz B");
+        listaTextos.add(textoMatrizInversa);
+        textoMatrizInversa.setFont(letraTexto);
+        textoMatrizInversa.setHorizontalAlignment(JLabel.CENTER);
+        textoMatrizInversa.setBounds(150, posVertical - 60, 450, 50);
+
+        JTable tablaMatrizInversa = new JTable(new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        });
+
+        scrollMatrizInversa = new PanelScroll(tablaMatrizInversa);
+        listaScrolls.add(scrollMatrizInversa);
+        scrollMatrizInversa.setBounds(posHorizontal, posVertical, ancho, alto);
+
+        posHorizontal += ancho + 40;
+        ancho = 100;
+
+        JTable tablaInversaIndep = new JTable(new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        });
+        
+        scrollInversaIndep = new PanelScroll(tablaInversaIndep);
+        listaScrolls.add(scrollInversaIndep);
+        scrollInversaIndep.setBounds(posHorizontal,posVertical,ancho,alto);
+        
+        posVertical -= alto*2;
+
+        JTable tablaJordanIndep = new JTable(new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        });
+        
+        scrollJordanIndep = new PanelScroll(tablaJordanIndep);
+        listaScrolls.add(scrollJordanIndep);
+        scrollJordanIndep.setBounds(posHorizontal,posVertical,ancho,alto);
+
+        posVertical += alto + 40;
+        ancho = 700 + 50;
+        posHorizontal = 20;
+        alto = 39;
+
+        JTable tablaResultados = new JTable(new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        });
+
+        scrollResultadosJordan = new PanelScroll(tablaResultados);
+        listaScrolls.add(scrollResultadosJordan);
+        scrollResultadosJordan.setBounds(posHorizontal, posVertical, ancho, alto);
+
+        JLabel resultadosObtenidos1 = new JLabel("Resultados Obtenidos");
+        listaTextos.add(resultadosObtenidos1);
+        resultadosObtenidos1.setFont(letraTexto);
+        resultadosObtenidos1.setHorizontalAlignment(JLabel.CENTER);
+        resultadosObtenidos1.setBounds(posHorizontal, posVertical-40, ancho, alto);
+
+        posVertical += 300;
+
+        tablaResultados = new JTable(new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        });
+
+        scrollResultadosInversa = new PanelScroll(tablaResultados);
+        listaScrolls.add(scrollResultadosInversa);
+        scrollResultadosInversa.setBounds(posHorizontal, posVertical, ancho, alto);
+
+        JLabel resultadosObtenidos2 = new JLabel("Resultados Obtenidos");
+        listaTextos.add(resultadosObtenidos2);
+        resultadosObtenidos2.setFont(letraTexto);
+        resultadosObtenidos2.setHorizontalAlignment(JLabel.CENTER);
+        resultadosObtenidos2.setBounds(posHorizontal, posVertical-40, ancho, alto);
         
         panelResultados.add(textoGaussJordan);
-        panelResultados.add(ScrollGaussJordan);
+        panelResultados.add(scrollGaussJordan);
+        panelResultados.add(scrollJordanIndep);
+        panelResultados.add(scrollResultadosJordan);
+        panelResultados.add(resultadosObtenidos1);
+        
+        panelResultados.add(textoMatrizInversa);
+        panelResultados.add(scrollMatrizInversa);
+        panelResultados.add(scrollInversaIndep);
+        panelResultados.add(scrollResultadosInversa);
+        panelResultados.add(resultadosObtenidos2);
     }
     private void inicializarPanelDatos() {
         panelDatos = new JPanel();
@@ -152,6 +344,7 @@ public class Ventana extends JFrame
         panelIncognitas.setBounds(10,30,750,50);
 
         JLabel textoIncognitas = new JLabel("Incognitas");
+        listaTextos.add(textoIncognitas);
         textoIncognitas.setFont(letraTexto);
         textoIncognitas.setHorizontalAlignment(JLabel.CENTER);
 
@@ -167,27 +360,30 @@ public class Ventana extends JFrame
         panelIncognitas.add(botonConfirmar);
 
         JLabel textoCoeficientes = new JLabel("            Coeficientes Variables               Independientes");
+        listaTextos.add(textoCoeficientes);
         textoCoeficientes.setFont(letraTexto);
         textoCoeficientes.setHorizontalAlignment(JLabel.CENTER);
         textoCoeficientes.setBounds(30,100,800,50);
 
         JTable tablaVariables = new JTable(new DefaultTableModel());
 
-        ScrollVariables = new PanelScroll(tablaVariables);
-        ScrollVariables.setBounds(20, 170, 600, 300);
+        scrollVariables = new PanelScroll(tablaVariables);
+        listaScrolls.add(scrollVariables);
+        scrollVariables.setBounds(20, 170, 600, 300);
 
         JTable tablaIndependientes = new JTable(new DefaultTableModel());
 
-        ScrollIndependientes = new PanelScroll(tablaIndependientes);
-        ScrollIndependientes.setBounds(600+20+20, 170, 130, 300);
+        scrollIndependientes = new PanelScroll(tablaIndependientes);
+        listaScrolls.add(scrollIndependientes);
+        scrollIndependientes.setBounds(600+20+20, 170, 130, 300);
 
         botonCalcular = new Boton(letraBoton);
         botonCalcular.setText("Calcular");
         botonCalcular.setVerticalAlignment(JButton.CENTER);
         botonCalcular.setBounds(280,500,200,50);
 
-        panelDatos.add(ScrollVariables);
-        panelDatos.add(ScrollIndependientes);
+        panelDatos.add(scrollVariables);
+        panelDatos.add(scrollIndependientes);
         panelDatos.add(panelIncognitas);
         panelDatos.add(textoCoeficientes);
         panelDatos.add(botonCalcular);
@@ -302,4 +498,48 @@ public class Ventana extends JFrame
         panelIzquierdo.setMinimumSize(panelIzquierdo.getSize());
         add(panelIzquierdo, BorderLayout.WEST);
     }
+
+    class limpiarSeleccion implements MouseInputListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            for (PanelScroll tabla : listaScrolls) {
+                tabla.matriz.clearSelection();
+                if(tabla.matriz.isEditing())
+                    tabla.matriz.getCellEditor().stopCellEditing();
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            
+        }
+
+    }
+
 }

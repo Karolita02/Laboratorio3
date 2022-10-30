@@ -82,8 +82,11 @@ public class Sistema_de_Ecuaciones
     }
 
     public void set_ecuaciones(double[][] coeficientes_variables, double[][] coeficientes_independientes){
-        this.coeficientes_variables = Arrays.copyOf(coeficientes_variables, (int)Math.pow(coeficientes_variables.length,2));
-        this.coeficientes_independientes = Arrays.copyOf(coeficientes_independientes, (int)Math.pow(coeficientes_independientes.length,2));
+        for (int i = 0; i < numero_incognitas; i++) 
+            for (int j = 0; j < numero_incognitas; j++) 
+                this.coeficientes_variables[i][j] = coeficientes_variables[i][j];
+        for (int i = 0; i < numero_incognitas; i++) 
+            this.coeficientes_independientes[i][0] = coeficientes_independientes[i][0];
     }
     public void set_coeficientes_variables(double[][] coeficientes_variables) {
 		this.coeficientes_variables = coeficientes_variables;

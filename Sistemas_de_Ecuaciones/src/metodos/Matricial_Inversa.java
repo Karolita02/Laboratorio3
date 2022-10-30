@@ -112,7 +112,7 @@ public class Matricial_Inversa extends Resolucion_de_Sistemas_de_Ecuaciones
         var matrizResultante = new double[matriz1.length][matriz2[0].length];
         for (int fila = 0; fila < matriz1.length; fila++) { 
             for (int columna = 0; columna < matriz2[0].length; columna++) {
-                for (int iterador = 0; iterador < matriz2.length; iterador++) {
+                for (int iterador = 0; iterador < matriz1[0].length; iterador++) {
                     matrizResultante[fila][columna] += matriz1[fila][iterador] * matriz2[iterador][columna];// ten yo :pena: es q solo tiene 1 columna el 2  y si dejamos q le de hasta las columnas del 1 va a pedir disq la columna 2 y 3 q no existen xd ah weno tonche shi tiene sentido lito ps hay que hacer la funcion cslcular alla  bien chevere xd 
                 }
             }
