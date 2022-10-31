@@ -1,12 +1,6 @@
 package programa;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
-
 import interfaz.Ventana;
-import metodos.Gauss_Jordan;
-import metodos.Matricial_Inversa;
 
 /*
  * Desarrollar en Java un programa que determine la solución de un sistema de ecuaciones 
