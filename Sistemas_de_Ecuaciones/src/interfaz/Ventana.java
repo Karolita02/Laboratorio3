@@ -407,7 +407,7 @@ public class Ventana extends JFrame
         textoMetodos.setFont(letraSubTitulo);
         textoMetodos.setHorizontalAlignment(JLabel.CENTER);
 
-        JLabel textoMetodos2 = new JLabel("Matriz Inversa");
+        JLabel textoMetodos2 = new JLabel("Matriz Inversa (A) * B");
         textoMetodos2.setFont(letraSubTitulo);
         textoMetodos2.setHorizontalAlignment(JLabel.CENTER);
 
