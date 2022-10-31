@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 import javax.swing.table.DefaultTableModel;
 
@@ -44,6 +45,8 @@ public class Ventana extends JFrame
     private ArrayList<PanelScroll> listaScrolls = new ArrayList<>();
 
     private double[][] coeficientesVariables, coeficientesIndependientes;
+
+    private int xMouse, yMouse;
 
     private DecimalFormat formato = new DecimalFormat("#.############");
 
@@ -75,6 +78,8 @@ public class Ventana extends JFrame
         establacerFuncionBotonConfirmar();
         establecerFuncionBotonCalcular();
         establecerFuncionesParaLimpiarTablas();
+        panelAccionesVentana.addMouseMotionListener(new Movilidad());
+        panelAccionesVentana.addMouseListener(new Movilidad());
         setVisible(true);
     }
     private void establecerFuncionesParaLimpiarTablas() {
@@ -536,7 +541,47 @@ public class Ventana extends JFrame
         public void mouseMoved(MouseEvent e) {
             
         }
-
     }
 
+    class Movilidad implements MouseInputListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            xMouse = e.getX();
+            yMouse = e.getY();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            int x = e.getXOnScreen();
+            int y = e.getYOnScreen();
+            setLocation(x - xMouse, y - yMouse);        
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            
+        }
+
+    }
 }
