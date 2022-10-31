@@ -1,5 +1,9 @@
 package programa;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
 import interfaz.Ventana;
 import metodos.Gauss_Jordan;
 import metodos.Matricial_Inversa;
@@ -20,19 +24,26 @@ import metodos.Matricial_Inversa;
 
 public class Principal {
     public static void main(String[] args) {
-        var ecuaciones = new double[][]{
-            {3,-0.1,-0.2,7.85},
-            {0.1,7,-0.3,-19.3},
-            {0.3,-0.2,10,71.4}
-        };
-        // var gauss = new Gauss_Jordan(ecuaciones,3);
+        // var ecuaciones = new double[][]{
+        //     {3,-0.1,-0.2,7.85},
+        //     {0.1,7,-0.3,-19.3},
+        //     {0.3,-0.2,10,71.4}
+        // };
+        // var ecuaciones = new double[][]{
+        //     {2,-1,4,1,-1,7},
+        //     {-1,3,-2,-1,2,1},
+        //     {5,1,3,-4,1,33},
+        //     {3,-2,-2,-2,3,24},
+        //     {-4,-1,-5,3,-4,-49}
+        // };
+        
+        // var gauss = new Gauss_Jordan(ecuaciones,ecuaciones.length);
         // gauss.calcular();
         // System.out.println(gauss.get_sistema_de_ecuaciones().toString()); // funciona :D
 
-        // var inversa = new Matricial_Inversa(ecuaciones, 3);
+        // var inversa = new Matricial_Inversa(ecuaciones, ecuaciones.length);
         // inversa.calcular();
         // System.out.println(inversa.get_sistema_de_ecuaciones().toString());
         new Ventana();
-        
     }
 }
