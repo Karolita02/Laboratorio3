@@ -131,7 +131,7 @@ public class Ventana extends JFrame
     private void ponerResultadosEnTabla(Resolucion_de_Sistemas_de_Ecuaciones metodo, PanelScroll tabla){
         var valores = metodo.get_sistema_de_ecuaciones().get_coeficientes_independientes();
         for (int pos = 0; pos < metodo.get_numero_incognitas(); pos++)
-            tabla.modeloTabla.setValueAt(valores[pos][0], 0, pos);
+            tabla.modeloTabla.setValueAt(formato.format(valores[pos][0]), 0, pos);
     }
     private void extraerATabla(Resolucion_de_Sistemas_de_Ecuaciones metodo, PanelScroll tabla, boolean esIndependiente, double[][] matrizB){
         var matrizResultado = esIndependiente ? 
@@ -148,7 +148,7 @@ public class Ventana extends JFrame
         var resultado = new Object[matriz.length][matriz[0].length];
         for (int i = 0; i < matriz.length; i++) 
             for (int j = 0; j < matriz[0].length; j++) 
-                resultado[i][j] = matriz[i][j];
+                resultado[i][j] = formato.format(matriz[i][j]);
         return resultado;
     }
     private void extraerAMatriz(PanelScroll scrollTabla, double[][] matriz) {

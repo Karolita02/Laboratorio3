@@ -18,7 +18,7 @@ public class Gauss_Jordan extends Resolucion_de_Sistemas_de_Ecuaciones
         for (int actual = 0; actual < get_numero_incognitas(); actual++) 
         {
             var fila_dominante = get_sistema_de_ecuaciones().get_fila(actual);
-            var denominador = fila_dominante[actual] != 0 ? fila_dominante[actual] : 1; //TODO mandar error
+            var denominador = fila_dominante[actual] != 0.0 ? fila_dominante[actual] : 1; //TODO mandar error
             fila_dominante = multiplicar_fila_por(fila_dominante, 1/denominador);
             get_sistema_de_ecuaciones().set_fila(fila_dominante, actual);
             for (int siguiente = actual+1; siguiente < get_numero_incognitas() + actual; siguiente++) 
