@@ -78,7 +78,6 @@ public class Ventana extends JFrame
         establecerFuncionBotonCalcular();
         establecerFuncionesParaLimpiarTablas();
         setVisible(true);
-
     }
     private void establecerFuncionesParaLimpiarTablas() {
         for (JLabel texto : listaTextos)
