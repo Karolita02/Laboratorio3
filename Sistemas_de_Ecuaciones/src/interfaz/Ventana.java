@@ -7,10 +7,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -420,6 +423,7 @@ public class Ventana extends JFrame
         textoIntegrantes2.setFont(letraTexto);
         textoIntegrantes2.setHorizontalAlignment(JLabel.CENTER);
 
+        
         panelBienvenida.add(textoMetodos);
         panelBienvenida.add(textoMetodos2);
         panelBienvenida.add(new JLabel());
@@ -427,9 +431,26 @@ public class Ventana extends JFrame
         panelBienvenida.add(textoIntegrantes);
         panelBienvenida.add(textoIntegrantes2);
 
+        JLabel logoUTP = new JLabel();
+        logoUTP.setBounds(5,5,180,180);
+        ponerIcono(logoUTP, "src/interfaz/imagenes/LogoUTP.jpg"); //? funciona con Eclipse
+        // ponerIcono(logoUTP, "Sistemas_de_Ecuaciones/src/interfaz/imagenes/LogoUTP.jpg"); //! funciona con VSCode
+
+        JLabel logoSistemas = new JLabel();
+        logoSistemas.setBounds(618-5,5,180,180);
+        ponerIcono(logoSistemas, "src/interfaz/imagenes/LogoSistemas.png"); //? funciona con Eclipse
+        // ponerIcono(logoSistemas, "Sistemas_de_Ecuaciones/src/interfaz/imagenes/LogoSistemas.png"); //! funciona con VSCode
+        
+        panelPrincipal.add(logoUTP);
+        panelPrincipal.add(logoSistemas);
         panelPrincipal.add(panelBienvenida);
 
         
+    }
+    private void ponerIcono(JLabel etiqueta, String ruta) {
+        ImageIcon imagen = new ImageIcon(ruta);
+        Icon icono = new ImageIcon(imagen.getImage().getScaledInstance(etiqueta.getWidth(), etiqueta.getHeight(), Image.SCALE_SMOOTH));
+        etiqueta.setIcon(icono);
     }
     private void inicializarPanelSuperior() {
         JLabel textoTitulo = new JLabel("Cálculo de Sistemas de Ecuaciones");
